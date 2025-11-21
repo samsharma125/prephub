@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { loginSchema } from "@/lib/validators";
 import { User } from "@/models/User";
 import bcrypt from "bcryptjs";
-import * as cookie from "cookie";
+import { serialize } from "cookie";    // ✔ FIXED
 import { signToken } from "@/lib/auth";
 import { dbConnect } from "@/lib/db";
 
@@ -40,18 +40,20 @@ export async function POST(req: Request) {
 
     const res = NextResponse.json({ ok: true });
 
+    // ✔ FIXED
     res.headers.set(
       "Set-Cookie",
-      cookie.serialize("token", token, {
+      serialize("token", token, {
         httpOnly: true,
         sameSite: "lax",
         path: "/",
       })
     );
 
+    // ✔ FIXED
     res.headers.append(
       "Set-Cookie",
-      cookie.serialize("role", role, {
+      serialize("role", role, {
         sameSite: "lax",
         path: "/",
       })
