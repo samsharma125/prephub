@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { MessageCircle, X } from "lucide-react";
+import { MessageCircle, X, Send } from "lucide-react";
 
 export default function ChatWidget() {
   const [open, setOpen] = useState(false);
@@ -12,7 +12,6 @@ export default function ChatWidget() {
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
@@ -38,11 +37,13 @@ export default function ChatWidget() {
 
   return (
     <>
-      {/* Floating Button */}
+      {/* Floating Open Button */}
       {!open && (
         <button
           onClick={() => setOpen(true)}
-          className="fixed bottom-6 right-6 bg-blue-600 text-white p-4 rounded-full shadow-xl hover:bg-blue-700 active:scale-95 transition"
+          className="fixed bottom-6 right-6 bg-blue-600 text-white p-4 rounded-full shadow-lg 
+          hover:bg-blue-700 transition active:scale-90 backdrop-blur-xl border border-white/10
+          animate-bounce-slow"
         >
           <MessageCircle size={28} />
         </button>
@@ -50,25 +51,29 @@ export default function ChatWidget() {
 
       {/* Chat Widget */}
       {open && (
-        <div className="fixed bottom-6 right-6 w-80 md:w-96 bg-white/80 backdrop-blur-xl border border-gray-300 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-fade-in">
-          
+        <div
+          className="fixed bottom-6 right-6 w-80 md:w-96 
+          bg-white/10 backdrop-blur-2xl border border-white/20 rounded-2xl shadow-2xl 
+          flex flex-col overflow-hidden animate-scale-in"
+        >
           {/* Header */}
-          <div className="px-5 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold text-lg shadow flex justify-between items-center">
+          <div className="px-5 py-3 bg-gradient-to-r from-blue-700 to-indigo-800 text-white 
+          font-semibold text-lg shadow flex justify-between items-center">
             PrepHub Copilot
-            <button onClick={() => setOpen(false)}>
-              <X size={22} className="text-white" />
+            <button onClick={() => setOpen(false)} className="hover:opacity-80">
+              <X size={22} />
             </button>
           </div>
 
           {/* Messages */}
-          <div className="p-4 space-y-3 max-h-80 overflow-y-auto bg-white/70">
+          <div className="p-4 space-y-3 max-h-80 overflow-y-auto custom-scrollbar">
             {messages.map((m, i) => (
               <div key={i} className={m.role === "user" ? "text-right" : "text-left"}>
                 <span
                   className={
                     m.role === "user"
-                      ? "inline-block bg-blue-600 text-white px-3 py-2 rounded-2xl rounded-tr-sm text-sm shadow"
-                      : "inline-block bg-gray-200 text-gray-800 px-3 py-2 rounded-2xl rounded-tl-sm text-sm shadow"
+                      ? "inline-block bg-blue-600 text-white px-4 py-2 rounded-2xl rounded-tr-sm text-sm shadow-lg"
+                      : "inline-block bg-white/20 backdrop-blur-md text-white px-4 py-2 rounded-2xl rounded-tl-sm text-sm shadow-lg border border-white/10"
                   }
                 >
                   {m.text}
@@ -77,31 +82,60 @@ export default function ChatWidget() {
             ))}
 
             {loading && (
-              <div className="text-gray-500 text-sm italic animate-pulse">
-                Thinking...
-              </div>
+              <div className="text-gray-300 text-sm italic animate-pulse">Thinking...</div>
             )}
 
             <div ref={messagesEndRef} />
           </div>
 
           {/* Input */}
-          <div className="p-3 border-t bg-white flex items-center gap-2">
+          <div className="p-3 border-t border-white/20 bg-white/10 backdrop-blur-xl flex items-center gap-2">
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask something..."
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-xl bg-white text-gray-800 focus:ring-2 focus:ring-blue-500 outline-none"
+              className="flex-1 px-3 py-2 border border-white/30 rounded-xl bg-white/20 
+              backdrop-blur-md text-white placeholder-gray-300 focus:ring-2 
+              focus:ring-blue-400 outline-none"
             />
+
             <button
               onClick={sendMessage}
-              className="bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition active:scale-95"
+              className="bg-blue-600 text-white px-4 py-2 rounded-xl shadow-lg 
+              hover:bg-blue-700 transition active:scale-95 flex items-center gap-1"
             >
-              Send
+              <Send size={18} />
             </button>
           </div>
         </div>
       )}
+
+      {/* Animations */}
+      <style>{`
+        .animate-scale-in {
+          animation: scaleIn 0.25s ease forwards;
+        }
+        @keyframes scaleIn {
+          from { transform: scale(0.8); opacity: 0; }
+          to { transform: scale(1); opacity: 1; }
+        }
+
+        .animate-bounce-slow {
+          animation: bounceSlow 2.4s infinite ease-in-out;
+        }
+        @keyframes bounceSlow {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-6px); }
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(255,255,255,0.2);
+          border-radius: 10px;
+        }
+      `}</style>
     </>
   );
 }

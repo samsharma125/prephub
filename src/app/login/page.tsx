@@ -1,16 +1,34 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Loader from "@/components/Loader";
 
 export default function LoginPage() {
   const router = useRouter();
+
+  const [pageLoading, setPageLoading] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<"student" | "admin">("student");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // -------- PAGE LOADER --------
+  useEffect(() => {
+    const timer = setTimeout(() => setPageLoading(false), 4500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (pageLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-[#081A3E]">
+        <Loader />
+      </div>
+    );
+  }
+
+  // -------- LOGIN FUNCTION --------
   const handleLogin = async () => {
     setError("");
     setLoading(true);
@@ -37,81 +55,90 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4">
-      <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md border border-gray-200 relative">
-        <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
-          Welcome to <span className="text-blue-600">PrepHub</span>
+    <div className="min-h-screen flex items-center justify-center bg-[#081A3E] px-4">
+      <div className="bg-[#0D224F] p-10 rounded-2xl shadow-xl w-full max-w-md border border-[#1B345F]">
+        
+        {/* LOGO */}
+        <div className="flex justify-center mb-4">
+          <div className="w-10 h-10 rounded bg-blue-500/20 flex items-center justify-center text-blue-400 text-2xl font-bold">
+            ✖
+          </div>
+        </div>
+
+        {/* TITLE */}
+        <h2 className="text-2xl font-bold text-center text-white">
+          Welcome Back to PrepHub
         </h2>
+        <p className="text-center text-gray-400 text-sm mb-6">
+          Sign in to access your dashboard.
+        </p>
 
-        {/* Email */}
-        <div className="mb-4">
-          <label className="text-gray-700 font-semibold">Email</label>
-          <input
-            type="email"
-            placeholder="Enter your email"
-            className="w-full p-3 mt-1 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
+        {/* ROLE TOGGLE */}
+        <div className="flex mb-5 bg-[#0A1C3A] p-1 rounded-lg border border-[#1C3056]">
+          <button
+            onClick={() => setRole("student")}
+            className={`flex-1 py-2 rounded-md text-sm font-medium transition ${
+              role === "student"
+                ? "bg-blue-600 text-white"
+                : "text-gray-300 hover:bg-[#13274E]"
+            }`}
+          >
+            Student
+          </button>
+
+          <button
+            onClick={() => setRole("admin")}
+            className={`flex-1 py-2 rounded-md text-sm font-medium transition ${
+              role === "admin"
+                ? "bg-blue-600 text-white"
+                : "text-gray-300 hover:bg-[#13274E]"
+            }`}
+          >
+            Admin
+          </button>
         </div>
 
-        {/* Password */}
-        <div className="mb-4">
-          <label className="text-gray-700 font-semibold">Password</label>
-          <input
-            type="password"
-            placeholder="Enter password"
-            className="w-full p-3 mt-1 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
+        {/* EMAIL */}
+        <label className="text-gray-300 text-sm font-medium">Email Address</label>
+        <input
+          type="email"
+          placeholder="you@example.com"
+          className="w-full mt-1 mb-4 p-3 bg-[#0A1C3A] border border-[#1C3056] text-white placeholder-gray-500 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
 
-        {/* Role Selection */}
-       <div className="mb-4">
-  <label className="text-gray-700 font-semibold mb-1 block">
-    Login as
-  </label>
+        {/* PASSWORD */}
+        <label className="text-gray-300 text-sm font-medium">Password</label>
+        <input
+          type="password"
+          placeholder="••••••••"
+          className="w-full mt-1 mb-4 p-3 bg-[#0A1C3A] border border-[#1C3056] text-white placeholder-gray-500 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
 
-  <div className="relative">
-    <select
-      className="w-full appearance-none p-3 border rounded-lg bg-white text-gray-700 font-medium 
-                 focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer"
-      value={role}
-      onChange={(e) => setRole(e.target.value as "student" | "admin")}
-    >
-      <option value="student">Student</option>
-      <option value="admin">Faculty Admin</option>
-    </select>
-
-    {/* Down Arrow Icon */}
-    <span className="absolute right-3 top-3.5 text-gray-500 pointer-events-none">
-      ▼
-    </span>
-  </div>
-</div>
-
-        {/* Error message */}
+        {/* ERROR */}
         {error && (
-          <p className="text-red-500 mb-3 font-medium text-center bg-red-50 py-2 rounded-lg border border-red-200">
+          <p className="text-red-400 text-center bg-red-900/20 border border-red-700 py-2 rounded-lg mb-4">
             {error}
           </p>
         )}
 
-        {/* Login button */}
+        {/* LOGIN BUTTON */}
         <button
           onClick={handleLogin}
           disabled={loading}
-          className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition disabled:opacity-50"
         >
-          {loading ? "Logging in..." : "Login"}
+          {loading ? "Signing in..." : "Log in"}
         </button>
 
-        {/* Footer */}
-        <p className="text-sm mt-6 text-center text-gray-700">
-          Don&apos;t have an account?{" "}
-          <a href="/signup" className="text-blue-600 font-semibold hover:underline">
-            Sign up
+        {/* FOOTER */}
+        <p className="text-sm mt-6 text-center text-gray-300">
+          Don’t have an account?{" "}
+          <a href="/signup" className="text-blue-400 hover:underline">
+            Sign Up
           </a>
         </p>
       </div>

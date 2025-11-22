@@ -12,7 +12,7 @@ export default function FacultyPage() {
       <Sidebar role={auth.role} />
 
       {/* Main Content */}
-      <main className="flex-1 p-8">
+      <main className="flex-1 p-8 mt-16 md:mt-0">
         {/* Page Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-800">Faculty Admin Panel</h1>
@@ -26,9 +26,7 @@ export default function FacultyPage() {
 
           {/* Manage Students */}
           <div className="p-6 bg-white rounded-2xl shadow hover:shadow-lg transition cursor-pointer border border-gray-100">
-            <h2 className="text-xl font-semibold text-gray-800 mb-2">
-              👨‍🎓 Manage Students
-            </h2>
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">👨‍🎓 Manage Students</h2>
             <p className="text-gray-600">
               Add, remove, and update student academic & account details.
             </p>
@@ -36,9 +34,7 @@ export default function FacultyPage() {
 
           {/* View Progress */}
           <div className="p-6 bg-white rounded-2xl shadow hover:shadow-lg transition cursor-pointer border border-gray-100">
-            <h2 className="text-xl font-semibold text-gray-800 mb-2">
-              📊 View Progress
-            </h2>
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">📊 View Progress</h2>
             <p className="text-gray-600">
               Track student test scores, activity logs, and performance analytics.
             </p>
@@ -46,9 +42,7 @@ export default function FacultyPage() {
 
           {/* Upload Notes */}
           <div className="p-6 bg-white rounded-2xl shadow hover:shadow-lg transition cursor-pointer border border-gray-100">
-            <h2 className="text-xl font-semibold text-gray-800 mb-2">
-              📚 Upload Study Materials
-            </h2>
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">📚 Upload Study Materials</h2>
             <p className="text-gray-600">
               Upload PDFs, assignments, and course notes for students.
             </p>
@@ -56,9 +50,7 @@ export default function FacultyPage() {
 
           {/* Attendance */}
           <div className="p-6 bg-white rounded-2xl shadow hover:shadow-lg transition cursor-pointer border border-gray-100">
-            <h2 className="text-xl font-semibold text-gray-800 mb-2">
-              📝 Attendance
-            </h2>
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">📝 Attendance</h2>
             <p className="text-gray-600">
               Mark attendance and generate attendance reports quickly.
             </p>
@@ -66,9 +58,7 @@ export default function FacultyPage() {
 
           {/* AI Insights */}
           <div className="p-6 bg-white rounded-2xl shadow hover:shadow-lg transition cursor-pointer border border-gray-100">
-            <h2 className="text-xl font-semibold text-gray-800 mb-2">
-              🤖 AI Insights
-            </h2>
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">🤖 AI Insights</h2>
             <p className="text-gray-600">
               Get AI-powered insights for student weaknesses & suggestions.
             </p>
@@ -76,9 +66,7 @@ export default function FacultyPage() {
 
           {/* Scheduling */}
           <div className="p-6 bg-white rounded-2xl shadow hover:shadow-lg transition cursor-pointer border border-gray-100">
-            <h2 className="text-xl font-semibold text-gray-800 mb-2">
-              🗓️ Manage Timetable
-            </h2>
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">🗓️ Manage Timetable</h2>
             <p className="text-gray-600">
               Create schedules, set tests, and manage upcoming events.
             </p>

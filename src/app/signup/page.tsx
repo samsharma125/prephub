@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Loader from "@/components/Loader";
+
 
 export default function SignupPage() {
   const router = useRouter();
@@ -11,7 +13,24 @@ export default function SignupPage() {
   const [role, setRole] = useState<"student" | "admin">("student");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+ // PAGE LOADER
+  const [pageLoading, setPageLoading] = useState(true);
 
+  useEffect(() => {
+    const timer = setTimeout(() => setPageLoading(false), 4500); // 4.5 sec
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (pageLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-[#0B1739]">
+        <Loader />
+      </div>
+    );
+  }
+
+
+  
   const handleSignup = async () => {
     setError("");
     setSuccess("");
@@ -26,7 +45,7 @@ export default function SignupPage() {
       const data = await res.json().catch(() => ({}));
 
       if (res.ok) {
-        setSuccess("Account created! Redirecting to login...");
+        setSuccess("Account created! Redirecting...");
         setTimeout(() => router.push("/login"), 1500);
       } else {
         setError(data.error || "Signup failed");
@@ -37,79 +56,83 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
-      <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
-        <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
-          Create an Account
+    <div className="min-h-screen flex items-center justify-center bg-[#0B1739] px-4">
+      <div className="w-full max-w-md bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-2xl shadow-xl">
+        
+        {/* Title */}
+        <h2 className="text-center text-3xl font-bold text-white mb-2">
+          Create your account
         </h2>
+        <p className="text-center text-blue-300 mb-6 text-sm">
+          Join PrepHub to get started
+        </p>
 
-        {/* Name */}
-        <div className="mb-4">
-          <label className="text-gray-700 font-semibold">Full Name</label>
-          <input
-            type="text"
-            placeholder="Your Name"
-            className="w-full p-3 mt-1 border rounded-lg text-black placeholder:text-gray-400 
-            focus:ring-2 focus:ring-blue-500 outline-none"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-        </div>
+        {/* Full Name */}
+        <label className="text-gray-300 font-medium text-sm">Full Name</label>
+        <input
+          type="text"
+          placeholder="Your Name"
+          className="w-full p-3 mt-1 mb-4 rounded-lg bg-transparent border border-gray-500 placeholder-gray-400 text-white focus:ring-2 focus:ring-blue-500"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
 
         {/* Email */}
-        <div className="mb-4">
-          <label className="text-gray-700 font-semibold">Email Address</label>
-          <input
-            type="email"
-            placeholder="you@example.com"
-            className="w-full p-3 mt-1 border rounded-lg text-black placeholder:text-gray-400 
-            focus:ring-2 focus:ring-blue-500 outline-none"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
+        <label className="text-gray-300 font-medium text-sm">Email Address</label>
+        <input
+          type="email"
+          placeholder="you@example.com"
+          className="w-full p-3 mt-1 mb-4 rounded-lg bg-transparent border border-gray-500 placeholder-gray-400 text-white focus:ring-2 focus:ring-blue-500"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
 
         {/* Password */}
-        <div className="mb-4">
-          <label className="text-gray-700 font-semibold">Password</label>
-          <input
-            type="password"
-            placeholder="••••••••"
-            className="w-full p-3 mt-1 border rounded-lg text-black placeholder:text-gray-400 
-            focus:ring-2 focus:ring-blue-500 outline-none"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
+        <label className="text-gray-300 font-medium text-sm">Password</label>
+        <input
+          type="password"
+          placeholder="••••••••"
+          className="w-full p-3 mt-1 mb-4 rounded-lg bg-transparent border border-gray-500 placeholder-gray-400 text-white focus:ring-2 focus:ring-blue-500"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
 
-        {/* Role Dropdown */}
-        <div className="mb-4">
-          <label className="text-gray-700 font-semibold">Sign up as</label>
-          <select
-            className="w-full p-3 mt-1 border rounded-lg bg-white text-black focus:ring-2 focus:ring-blue-500"
-            value={role}
-            onChange={(e) => setRole(e.target.value as "student" | "admin")}
-          >
-            <option value="student">Student</option>
-            <option value="admin">Faculty Admin</option>
-          </select>
-        </div>
+        {/* Role selection */}
+        <label className="text-gray-300 font-medium text-sm">Sign up as</label>
+        <select
+          className="w-full p-3 mt-1 mb-4 rounded-lg bg-transparent border border-gray-500 text-white focus:ring-2 focus:ring-blue-500 cursor-pointer"
+          value={role}
+          onChange={(e) => setRole(e.target.value as "student" | "admin")}
+        >
+          <option className="text-black" value="student">Student</option>
+          <option className="text-black" value="admin">Faculty Admin</option>
+        </select>
 
-        {/* Messages */}
-        {error && <p className="text-red-500 mb-4">{error}</p>}
-        {success && <p className="text-green-600 mb-4">{success}</p>}
+        {/* Error / Success */}
+        {error && (
+          <p className="text-red-400 bg-red-900/20 p-2 rounded-lg border border-red-700 text-sm mb-3 text-center">
+            {error}
+          </p>
+        )}
+
+        {success && (
+          <p className="text-green-400 bg-green-900/20 p-2 rounded-lg border border-green-700 text-sm mb-3 text-center">
+            {success}
+          </p>
+        )}
 
         {/* Button */}
         <button
           onClick={handleSignup}
-          className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition"
+          className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition shadow-lg"
         >
           Sign Up
         </button>
 
-        <p className="text-sm mt-4 text-center text-gray-700">
+        {/* Bottom Link */}
+        <p className="text-sm mt-6 text-center text-gray-300">
           Already have an account?{" "}
-          <a href="/login" className="text-blue-600 font-semibold underline">
+          <a href="/login" className="text-blue-400 font-semibold hover:underline">
             Login
           </a>
         </p>
