@@ -9,8 +9,6 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@tailwindcss/cli": "^4.1.17",
-    "@tailwindcss/postcss": "^4.1.17",
     "bcryptjs": "^2.4.3",
     "clsx": "^2.0.0",
     "cookie": "^1.0.2",
