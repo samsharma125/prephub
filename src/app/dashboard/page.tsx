@@ -15,7 +15,7 @@ export default function DashboardPage() {
       {/* Main Content */}
       <main className="flex-1 p-8 pt-20 md:pt-8">
         <h1 className="text-3xl font-bold mb-8 text-blue-400">
-          Welcome Back, {auth.email.split("@")[0]} 👋
+         Welcome Back, {auth.name} 👋
         </h1>
 
         {/* Overview Cards */}
