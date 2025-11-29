@@ -4,12 +4,11 @@ import { cookies } from 'next/headers'
 const JWT_SECRET = process.env.JWT_SECRET as string
 if (!JWT_SECRET) throw new Error('Missing JWT_SECRET')
 
-// 🔥 Add `name` here so JWT contains user’s name
 export type TokenPayload = { 
   userId: string; 
   role: 'student' | 'admin'; 
   email: string;
-  name: string;   // ⬅ NOW name is included
+  name: string;   // name included
 }
 
 export function signToken(payload: TokenPayload) {
