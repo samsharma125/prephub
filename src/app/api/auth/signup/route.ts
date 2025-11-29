@@ -3,7 +3,7 @@ import { signupSchema } from "@/lib/validators";
 import { User } from "@/models/User";
 import bcrypt from "bcryptjs";
 import { dbConnect } from "@/lib/db";
-import * as cookie from "cookie";   // ✅ FIXED IMPORT
+import * as cookie from "cookie";
 import { signToken } from "@/lib/auth";
 
 export async function POST(req: Request) {
@@ -36,10 +36,12 @@ export async function POST(req: Request) {
       role,
     });
 
+    // <-- FIX: include `name` in the token payload
     const token = signToken({
       userId: user._id.toString(),
-      email,
-      role,
+      email: user.email,
+      role: user.role,
+      name: user.name, // <--- required
     });
 
     const res = NextResponse.json({ ok: true });
@@ -55,7 +57,7 @@ export async function POST(req: Request) {
 
     res.headers.append(
       "Set-Cookie",
-      cookie.serialize("role", role, {
+      cookie.serialize("role", user.role, {
         sameSite: "lax",
         path: "/",
       })
