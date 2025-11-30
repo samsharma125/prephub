@@ -9,7 +9,8 @@ export default function FacultyPage() {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <Sidebar role={auth.role} />
+     <Sidebar role={auth.role} auth={auth} />
+
 
       {/* Main Content */}
       <main className="flex-1 p-8 mt-16 md:mt-0">
