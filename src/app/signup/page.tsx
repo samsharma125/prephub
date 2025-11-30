@@ -17,7 +17,7 @@ export default function SignupPage() {
   const [pageLoading, setPageLoading] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => setPageLoading(false), 4500); // 4.5 sec
+    const timer = setTimeout(() => setPageLoading(false), 2000); // 4.5 sec
     return () => clearTimeout(timer);
   }, []);
 
