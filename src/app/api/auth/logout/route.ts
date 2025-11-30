@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 
-export async function POST() {
+export async function POST(request: Request) {
   try {
-    const response = NextResponse.redirect(new URL("/login", process.env.NEXT_PUBLIC_BASE_URL || "https://heroic-brioche-ddbd6a.netlify.app/"));
+    const url = new URL("/login", request.url); // <-- ABSOLUTE URL FIX
+
+    const response = NextResponse.redirect(url);
 
     // Clear token cookie
     response.cookies.set("token", "", {
@@ -11,7 +13,7 @@ export async function POST() {
       expires: new Date(0),
     });
 
-    // Clear role cookie if you stored one
+    // Clear role cookie
     response.cookies.set("role", "", {
       path: "/",
       expires: new Date(0),
