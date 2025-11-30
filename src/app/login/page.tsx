@@ -16,7 +16,7 @@ export default function LoginPage() {
 
   // -------- PAGE LOADER --------
   useEffect(() => {
-    const timer = setTimeout(() => setPageLoading(false), 2500);
+    const timer = setTimeout(() => setPageLoading(false), 2000);
     return () => clearTimeout(timer);
   }, []);
 
