@@ -1,10 +1,19 @@
 import { NextResponse } from "next/server";
 
+export async function GET(request: Request) {
+  return handleLogout(request);
+}
+
 export async function POST(request: Request) {
-  const url = new URL("/login", request.url);
+  return handleLogout(request);
+}
 
-  const response = NextResponse.redirect(url);
+function handleLogout(request: Request) {
+  const loginURL = new URL("/login", request.url);
 
+  const response = NextResponse.redirect(loginURL);
+
+  // Clear cookies
   response.cookies.set("token", "", {
     httpOnly: true,
     path: "/",

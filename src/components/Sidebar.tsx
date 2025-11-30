@@ -31,28 +31,23 @@ export default function Sidebar({
   const [open, setOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
 
-  // ref for the user button
   const userBtnRef = useRef<HTMLButtonElement | null>(null)
 
-  // dropdown position (fixed coords)
-  const [pos, setPos] = useState<{ left: number; top: number; width: number } | null>(null)
+  const [pos, setPos] =
+    useState<{ left: number; top: number; width: number } | null>(null)
 
-  // compute & set position based on button rect
   const computePosition = () => {
     const btn = userBtnRef.current
     if (!btn) return
     const rect = btn.getBoundingClientRect()
-    const menuWidth = 288 // w-72 ~ 288px
-    // Prefer aligning menu's right edge with button's right edge
+    const menuWidth = 288
+
     let left = rect.right - menuWidth
-    // if left goes off-screen, clamp to 8px
     left = Math.max(8, Math.min(left, window.innerWidth - menuWidth - 8))
-    // place menu below the button
-    const top = rect.bottom + 8 + window.scrollY - window.scrollY // fixed uses viewport coords, so use rect.bottom
+
     setPos({ left, top: rect.bottom + 8, width: menuWidth })
   }
 
-  // toggle handler
   const toggleProfile = (e?: React.MouseEvent) => {
     e?.stopPropagation()
     if (!profileOpen) {
@@ -63,20 +58,21 @@ export default function Sidebar({
     }
   }
 
-  // close on outside click
   useEffect(() => {
     const onDocClick = () => setProfileOpen(false)
     window.addEventListener('click', onDocClick)
     return () => window.removeEventListener('click', onDocClick)
   }, [])
 
-  // reposition on resize & scroll if menu open
   useEffect(() => {
     if (!profileOpen) return
+
     const onResize = () => computePosition()
     const onScroll = () => computePosition()
+
     window.addEventListener('resize', onResize)
     window.addEventListener('scroll', onScroll, { passive: true })
+
     return () => {
       window.removeEventListener('resize', onResize)
       window.removeEventListener('scroll', onScroll)
@@ -85,13 +81,11 @@ export default function Sidebar({
 
   return (
     <>
-      {/* ---------------- NAVBAR ---------------- */}
+      {/* NAVBAR */}
       <div
         className="flex items-center justify-between bg-white border-b px-4 py-2 fixed top-0 left-0 w-full z-50"
-        style={{ overflow: 'visible' }} // allow visible overflow but dropdown is fixed so header won't expand
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Left: Hamburger + Logo */}
         <div className="flex items-center gap-6">
           <button onClick={(e) => { e.stopPropagation(); setOpen(true) }}>
             <Menu size={21} className="text-black" />
@@ -100,14 +94,11 @@ export default function Sidebar({
           <h1 className="text-xl font-bold text-black">PrepHub</h1>
         </div>
 
-        {/* Right: Notification + User */}
         <div className="flex items-center gap-6">
-          {/* Notification */}
           <button>
             <Bell size={22} className="text-black" />
           </button>
 
-          {/* USER BUTTON (we render menu as FIXED separately) */}
           <div className="relative" onClick={(e) => e.stopPropagation()}>
             <button
               ref={userBtnRef}
@@ -124,10 +115,9 @@ export default function Sidebar({
         </div>
       </div>
 
-      {/* Push content down */}
       <div className="h-[55px]" />
 
-      {/* ---------------- SIDEBAR OVERLAY ---------------- */}
+      {/* OVERLAY */}
       {open && (
         <div
           className="fixed inset-0 bg-black/40 z-40"
@@ -135,7 +125,7 @@ export default function Sidebar({
         />
       )}
 
-      {/* ---------------- SIDEBAR ---------------- */}
+      {/* SIDEBAR */}
       <aside
         className={`fixed top-0 left-0 h-full w-64 bg-white shadow-xl z-50 transform transition-transform duration-300 
           ${open ? 'translate-x-0' : '-translate-x-full'}`}
@@ -148,7 +138,6 @@ export default function Sidebar({
           </button>
         </div>
 
-        {/* Sidebar Links */}
         <nav className="p-3 space-y-1">
           {links
             .filter((l) => !l.role || l.role === role)
@@ -169,89 +158,83 @@ export default function Sidebar({
         </nav>
       </aside>
 
-      {/* ---------------- FIXED DROPDOWN (removed from header flow) ---------------- */}
-     {profileOpen && pos && (
-  <div
-    style={{
-      position: "fixed",
-      top: pos.top,
-      left: pos.left,
-      width: pos.width,
-      zIndex: 9999,
-    }}
-    onClick={(e) => e.stopPropagation()}
-  >
-    <div className="
-      rounded-xl 
-      overflow-hidden 
-      shadow-[0_8px_25px_rgba(0,0,0,0.45)] 
-      border border-[#415a77]/30 
-      bg-[#0d1b2a]/95 
-      backdrop-blur-xl
-    ">
-
-      {/* USER SECTION */}
-      <div className="p-4 border-b border-[#415a77]/40">
-        <p className="font-semibold text-blue-300 text-[15px] tracking-wide">
-          {auth.name}
-        </p>
-        <p className="text-gray-400 text-xs mt-1 tracking-wide">
-          {auth.email}
-        </p>
-      </div>
-
-      {/* PROFILE */}
-      <Link
-        href="/profile"
-        className="
-          block px-4 py-3 
-          text-gray-200 text-sm 
-          hover:bg-[#13203a] 
-          hover:text-blue-300 
-          transition-all
-        "
-      >
-        Profile
-      </Link>
-
-      {/* SETTINGS */}
-      <Link
-        href="/settings"
-        className="
-          block px-4 py-3 
-          text-gray-200 text-sm
-          hover:bg-[#13203a] 
-          hover:text-blue-300 
-          transition-all
-        "
-      >
-        Account Settings
-      </Link>
-
-      <hr className="border-[#415a77]/20" />
-
-      {/* SIGN OUT */}
-      <form action="/api/auth/logout" method="POST">
-        <button
-          className="
-            w-full text-left 
-            px-4 py-3 
-            text-red-400 text-sm 
-            hover:bg-[#3b0f14]/60 
-            hover:text-red-300 
-            transition-all
-          "
+      {/* USER DROPDOWN */}
+      {profileOpen && pos && (
+        <div
+          style={{
+            position: "fixed",
+            top: pos.top,
+            left: pos.left,
+            width: pos.width,
+            zIndex: 9999,
+          }}
+          onClick={(e) => e.stopPropagation()}
         >
-          Sign Out
-        </button>
-      </form>
+          <div className="
+            rounded-xl 
+            overflow-hidden 
+            shadow-[0_8px_25px_rgba(0,0,0,0.45)] 
+            border border-[#415a77]/30 
+            bg-[#0d1b2a]/95 
+            backdrop-blur-xl
+          ">
 
-    </div>
-  </div>
-)}
+            {/* USER INFO */}
+            <div className="p-4 border-b border-[#415a77]/40">
+              <p className="font-semibold text-blue-300 text-[15px] tracking-wide">
+                {auth.name}
+              </p>
+              <p className="text-gray-400 text-xs mt-1 tracking-wide">
+                {auth.email}
+              </p>
+            </div>
 
+            <Link
+              href="/profile"
+              className="block px-4 py-3 text-gray-200 text-sm hover:bg-[#13203a] hover:text-blue-300 transition-all"
+            >
+              Profile
+            </Link>
 
-      
+            <Link
+              href="/settings"
+              className="block px-4 py-3 text-gray-200 text-sm hover:bg-[#13203a] hover:text-blue-300 transition-all"
+            >
+              Account Settings
+            </Link>
+
+            <hr className="border-[#415a77]/20" />
+
+            {/* SIGN OUT — FIXED */}
+            <button
+              onClick={async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const res = await fetch("/api/auth/logout", {
+                  method: "POST",
+                  credentials: "include",
+                });
+
+                if (res.redirected) {
+                  window.location.href = res.url;
+                }
+              }}
+              className="
+                w-full text-left 
+                px-4 py-3 
+                text-red-400 text-sm 
+                hover:bg-[#3b0f14]/60 
+                hover:text-red-300 
+                transition-all
+              "
+            >
+              Sign Out
+            </button>
+
+          </div>
+        </div>
+      )}
     </>
   )
 }
