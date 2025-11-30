@@ -33,11 +33,38 @@ export default function Navbar() {
 
             <div className="my-3 border-t"></div>
 
-            <form action="/api/auth/logout" method="POST">
-              <button className="w-full text-left text-red-500 hover:text-red-600 font-medium">
-                Logout
-              </button>
-            </form>
+          <button
+  onClick={async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const res = await fetch("/api/auth/logout", {
+      method: "POST",
+      credentials: "include",
+      redirect: "follow",
+    });
+
+    // If API already redirected, browser follows automatically
+    if (res.redirected) {
+      window.location.href = res.url;
+      return;
+    }
+
+    // Fallback redirect (rare case)
+    window.location.href = "/login";
+  }}
+  className="
+    w-full text-left 
+    px-4 py-3 
+    text-red-400 text-sm 
+    hover:bg-[#3b0f14]/60 
+    hover:text-red-300 
+    transition-all
+  "
+>
+  Sign Out
+</button>
+
           </div>
         )}
       </div>

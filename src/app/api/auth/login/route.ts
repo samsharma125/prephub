@@ -48,6 +48,7 @@ export async function POST(req: Request) {
         httpOnly: true,
         sameSite: "lax",
         path: "/",
+        domain: "prephub1.vercel.app", 
       })
     );
 
