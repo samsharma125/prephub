@@ -8,28 +8,32 @@ export default function DashboardPage() {
   if (!auth) redirect("/login");
 
   return (
-    <div className="flex min-h-screen bg-[#0d1b2a] text-white">
-      {/* Sidebar */}
-      <Sidebar role={auth.role} />
+    <div className="bg-[#0d1b2a] text-white min-h-screen">
 
-      {/* Main Content */}
-      <main className="flex-1 p-8 pt-20 md:pt-8">
-        <h1 className="text-3xl font-bold mb-8 text-blue-400">
-         Welcome Back, {auth.name} 👋
-        </h1>
+      {/* FIX: Sidebar stays fixed on desktop */}
+<Sidebar role={auth.role} auth={auth} />
+
+
+
+      {/* FIX: Content starts below navbar + shifted right on desktop */}
+      <main className="pt-20 md:pt-20 md:pl-64 p-6">
+   <h1 className="text-3xl font-bold mb-8 text-blue-400">
+  Welcome Back,
+  <span className="max-sm:block"> {auth.name} 👋</span>
+</h1>
+
+
 
         {/* Overview Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-10">
-          <div className="p-6 bg-[#1b263b] rounded-2xl shadow hover:shadow-xl transition border border-[#415a77]/30">
-            <h2 className="text-lg font-semibold text-blue-300 mb-2">
-              Activity
-            </h2>
+          <div className="p-6 bg-[#1b263b] rounded-2xl border border-[#415a77]/30">
+            <h2 className="text-lg font-semibold text-blue-300 mb-2">Activity</h2>
             <p className="text-gray-300 text-sm">
               Your recent activity and updates appear here.
             </p>
           </div>
 
-          <div className="p-6 bg-[#1b263b] rounded-2xl shadow hover:shadow-xl transition border border-[#415a77]/30">
+          <div className="p-6 bg-[#1b263b] rounded-2xl border border-[#415a77]/30">
             <h2 className="text-lg font-semibold text-blue-300 mb-2">
               Mock Test Summary
             </h2>
@@ -38,7 +42,7 @@ export default function DashboardPage() {
             </p>
           </div>
 
-          <div className="p-6 bg-[#1b263b] rounded-2xl shadow hover:shadow-xl transition border border-[#415a77]/30">
+          <div className="p-6 bg-[#1b263b] rounded-2xl border border-[#415a77]/30">
             <h2 className="text-lg font-semibold text-blue-300 mb-2">
               Assignments
             </h2>
@@ -47,10 +51,8 @@ export default function DashboardPage() {
             </p>
           </div>
 
-          <div className="p-6 bg-[#1b263b] rounded-2xl shadow hover:shadow-xl transition border border-[#415a77]/30">
-            <h2 className="text-lg font-semibold text-blue-300 mb-2">
-              Calendar
-            </h2>
+          <div className="p-6 bg-[#1b263b] rounded-2xl border border-[#415a77]/30">
+            <h2 className="text-lg font-semibold text-blue-300 mb-2">Calendar</h2>
             <p className="text-gray-300 text-sm">
               View lectures, exams & important events.
             </p>

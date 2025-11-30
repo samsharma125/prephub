@@ -1,10 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import clsx from 'clsx'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, Bell } from 'lucide-react'
 
 const links = [
   { href: '/dashboard', label: 'Dashboard' },
@@ -20,63 +20,126 @@ const links = [
   { href: '/settings', label: 'Settings' }
 ]
 
-export default function Sidebar({ role }: { role: 'student' | 'admin' }) {
+export default function Sidebar({
+  role,
+  auth
+}: {
+  role: 'student' | 'admin',
+  auth: { name: string; email: string }
+}) {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
+  const [profileOpen, setProfileOpen] = useState(false)
+
+  // ref for the user button
+  const userBtnRef = useRef<HTMLButtonElement | null>(null)
+
+  // dropdown position (fixed coords)
+  const [pos, setPos] = useState<{ left: number; top: number; width: number } | null>(null)
+
+  // compute & set position based on button rect
+  const computePosition = () => {
+    const btn = userBtnRef.current
+    if (!btn) return
+    const rect = btn.getBoundingClientRect()
+    const menuWidth = 288 // w-72 ~ 288px
+    // Prefer aligning menu's right edge with button's right edge
+    let left = rect.right - menuWidth
+    // if left goes off-screen, clamp to 8px
+    left = Math.max(8, Math.min(left, window.innerWidth - menuWidth - 8))
+    // place menu below the button
+    const top = rect.bottom + 8 + window.scrollY - window.scrollY // fixed uses viewport coords, so use rect.bottom
+    setPos({ left, top: rect.bottom + 8, width: menuWidth })
+  }
+
+  // toggle handler
+  const toggleProfile = (e?: React.MouseEvent) => {
+    e?.stopPropagation()
+    if (!profileOpen) {
+      computePosition()
+      setProfileOpen(true)
+    } else {
+      setProfileOpen(false)
+    }
+  }
+
+  // close on outside click
+  useEffect(() => {
+    const onDocClick = () => setProfileOpen(false)
+    window.addEventListener('click', onDocClick)
+    return () => window.removeEventListener('click', onDocClick)
+  }, [])
+
+  // reposition on resize & scroll if menu open
+  useEffect(() => {
+    if (!profileOpen) return
+    const onResize = () => computePosition()
+    const onScroll = () => computePosition()
+    window.addEventListener('resize', onResize)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => {
+      window.removeEventListener('resize', onResize)
+      window.removeEventListener('scroll', onScroll)
+    }
+  }, [profileOpen])
 
   return (
     <>
-      {/* MOBILE TOP NAV */}
-      <div className="md:hidden flex items-center justify-between bg-white shadow px-4 py-3 fixed w-full z-50">
-        <button onClick={() => setOpen(true)}>
-          <Menu size={28} className="text-black" />
-        </button>
-        <h1 className="text-xl font-bold text-black">PrepHub</h1>
+      {/* ---------------- NAVBAR ---------------- */}
+      <div
+        className="flex items-center justify-between bg-white border-b px-4 py-2 fixed top-0 left-0 w-full z-50"
+        style={{ overflow: 'visible' }} // allow visible overflow but dropdown is fixed so header won't expand
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Left: Hamburger + Logo */}
+        <div className="flex items-center gap-6">
+          <button onClick={(e) => { e.stopPropagation(); setOpen(true) }}>
+            <Menu size={21} className="text-black" />
+          </button>
+
+          <h1 className="text-xl font-bold text-black">PrepHub</h1>
+        </div>
+
+        {/* Right: Notification + User */}
+        <div className="flex items-center gap-6">
+          {/* Notification */}
+          <button>
+            <Bell size={22} className="text-black" />
+          </button>
+
+          {/* USER BUTTON (we render menu as FIXED separately) */}
+          <div className="relative" onClick={(e) => e.stopPropagation()}>
+            <button
+              ref={userBtnRef}
+              onClick={toggleProfile}
+              className="inline-flex items-center"
+            >
+              <img
+                src="/user.png"
+                className="w-10 h-10 rounded-full border shadow"
+                alt="User"
+              />
+            </button>
+          </div>
+        </div>
       </div>
 
-      {/* DESKTOP SIDEBAR */}
-      <aside className="hidden md:flex w-64 border-r bg-white flex-col min-h-screen">
-        <div className="p-4 font-bold text-xl text-black">PrepHub</div>
+      {/* Push content down */}
+      <div className="h-[55px]" />
 
-        <nav className="space-y-1">
-          {links
-            .filter((l) => !('role' in l) || l.role === role)
-            .map((l) => (
-              <Link
-                key={l.href}
-                href={l.href}
-                className={clsx(
-                  'block px-4 py-2 hover:bg-blue-50 text-black',
-                  pathname === l.href &&
-                    'bg-blue-100 text-blue-700 font-semibold'
-                )}
-              >
-                {l.label}
-              </Link>
-            ))}
-        </nav>
-
-        <div className="mt-auto p-4">
-          <form action="/api/auth/logout" method="POST">
-            <button className="w-full bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded text-black">
-              Log out
-            </button>
-          </form>
-        </div>
-      </aside>
-
-      {/* MOBILE OVERLAY */}
+      {/* ---------------- SIDEBAR OVERLAY ---------------- */}
       {open && (
         <div
-          className="fixed inset-0 bg-black/40 z-40 md:hidden"
+          className="fixed inset-0 bg-black/40 z-40"
           onClick={() => setOpen(false)}
         />
       )}
 
-      {/* MOBILE SIDE DRAWER */}
+      {/* ---------------- SIDEBAR ---------------- */}
       <aside
-        className={`fixed top-0 left-0 h-full w-64 bg-white shadow-lg z-50 transform transition-transform duration-300 md:hidden
-        ${open ? 'translate-x-0' : '-translate-x-full'}`}
+        className={`fixed top-0 left-0 h-full w-64 bg-white shadow-xl z-50 transform transition-transform duration-300 
+          ${open ? 'translate-x-0' : '-translate-x-full'}`}
+        onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between p-4 border-b">
           <h2 className="text-xl font-bold text-black">PrepHub</h2>
@@ -85,9 +148,10 @@ export default function Sidebar({ role }: { role: 'student' | 'admin' }) {
           </button>
         </div>
 
+        {/* Sidebar Links */}
         <nav className="p-3 space-y-1">
           {links
-            .filter((l) => !('role' in l) || l.role === role)
+            .filter((l) => !l.role || l.role === role)
             .map((l) => (
               <Link
                 key={l.href}
@@ -96,22 +160,98 @@ export default function Sidebar({ role }: { role: 'student' | 'admin' }) {
                 className={clsx(
                   'block px-4 py-2 hover:bg-blue-50 text-black rounded',
                   pathname === l.href &&
-                    'bg-blue-100 text-blue-700 font-semibold'
+                  'bg-blue-100 text-blue-700 font-semibold'
                 )}
               >
                 {l.label}
               </Link>
             ))}
         </nav>
-
-        <div className="mt-auto p-4">
-          <form action="/api/auth/logout" method="POST">
-            <button className="w-full bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded text-black">
-              Log out
-            </button>
-          </form>
-        </div>
       </aside>
+
+      {/* ---------------- FIXED DROPDOWN (removed from header flow) ---------------- */}
+     {profileOpen && pos && (
+  <div
+    style={{
+      position: "fixed",
+      top: pos.top,
+      left: pos.left,
+      width: pos.width,
+      zIndex: 9999,
+    }}
+    onClick={(e) => e.stopPropagation()}
+  >
+    <div className="
+      rounded-xl 
+      overflow-hidden 
+      shadow-[0_8px_25px_rgba(0,0,0,0.45)] 
+      border border-[#415a77]/30 
+      bg-[#0d1b2a]/95 
+      backdrop-blur-xl
+    ">
+
+      {/* USER SECTION */}
+      <div className="p-4 border-b border-[#415a77]/40">
+        <p className="font-semibold text-blue-300 text-[15px] tracking-wide">
+          {auth.name}
+        </p>
+        <p className="text-gray-400 text-xs mt-1 tracking-wide">
+          {auth.email}
+        </p>
+      </div>
+
+      {/* PROFILE */}
+      <Link
+        href="/profile"
+        className="
+          block px-4 py-3 
+          text-gray-200 text-sm 
+          hover:bg-[#13203a] 
+          hover:text-blue-300 
+          transition-all
+        "
+      >
+        Profile
+      </Link>
+
+      {/* SETTINGS */}
+      <Link
+        href="/settings"
+        className="
+          block px-4 py-3 
+          text-gray-200 text-sm
+          hover:bg-[#13203a] 
+          hover:text-blue-300 
+          transition-all
+        "
+      >
+        Account Settings
+      </Link>
+
+      <hr className="border-[#415a77]/20" />
+
+      {/* SIGN OUT */}
+      <form action="/api/auth/logout" method="POST">
+        <button
+          className="
+            w-full text-left 
+            px-4 py-3 
+            text-red-400 text-sm 
+            hover:bg-[#3b0f14]/60 
+            hover:text-red-300 
+            transition-all
+          "
+        >
+          Sign Out
+        </button>
+      </form>
+
+    </div>
+  </div>
+)}
+
+
+      
     </>
   )
 }
